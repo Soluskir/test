@@ -7,15 +7,17 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] float runSpeed = 5f;
     [SerializeField] float jumpRange = 15f;
+    [SerializeField] Transform gun;
+    [SerializeField] GameObject bullet;
 
     Vector2 moveInput;
-    Rigidbody2D rigidbody2D;
+    Rigidbody2D rb2d;
     Animator myAnimator;
     BoxCollider2D feetCollider;
 
     void Start()
     {
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        rb2d = GetComponent<Rigidbody2D>();
         myAnimator = GetComponent<Animator>();
         feetCollider = GetComponent<BoxCollider2D>();
 
@@ -25,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Run();
         FlipSprite();
-        Jumping();
+        JumpingAnimation();
     }
 
     void OnMove(InputValue value)
@@ -35,20 +37,20 @@ public class PlayerMovement : MonoBehaviour
 
     void Run()
     {
-        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, rigidbody2D.velocity.y);
-        rigidbody2D.velocity = playerVelocity;
+        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, rb2d.velocity.y);
+        rb2d.velocity = playerVelocity;
 
-        bool playerHasHorizontalSpeed = Mathf.Abs(rigidbody2D.velocity.x) > Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(rb2d.velocity.x) > Mathf.Epsilon;
         myAnimator.SetBool("isRunning", playerHasHorizontalSpeed);
     }
 
     void FlipSprite()
     {
-        bool playerHasHorizontalSpeed = Mathf.Abs(rigidbody2D.velocity.x) > Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(rb2d.velocity.x) > Mathf.Epsilon;
 
         if (playerHasHorizontalSpeed)
         {
-            transform.localScale = new Vector2(Mathf.Sign(rigidbody2D.velocity.x), 1f);
+            transform.localScale = new Vector2(Mathf.Sign(rb2d.velocity.x), 1f);
         }
     }
 
@@ -61,20 +63,39 @@ public class PlayerMovement : MonoBehaviour
 
         if (value.isPressed)
         {
-            rigidbody2D.velocity += new Vector2(0f, jumpRange);
-            myAnimator.SetBool("isJumping", true);
+            rb2d.velocity += new Vector2(0f, jumpRange);
+        }
+
+    }
+
+    void OnFire(InputValue value)
+    {
+
+        if (value.isPressed & !myAnimator.GetBool("isRunning"))
+        {
+            Instantiate(bullet, gun.position, transform.rotation);
+            myAnimator.Play("Base Layer.Shoot Arny", 0, 0f);
+        }
+
+        if (value.isPressed & myAnimator.GetBool("isRunning"))
+        {
+            Instantiate(bullet, gun.position, transform.rotation);
+            myAnimator.Play("Base Layer.Walk Shooting", 0, 0f);
         }
     }
 
-    void Jumping()
+    void JumpingAnimation()
     {
         if (!feetCollider.IsTouchingLayers(LayerMask.GetMask("Platforms")))
         {
             myAnimator.SetBool("isJumping", true);
         }
-        else
+
+        if (feetCollider.IsTouchingLayers(LayerMask.GetMask("Platforms")))
         {
             myAnimator.SetBool("isJumping", false);
         }
     }
+
 }
+
