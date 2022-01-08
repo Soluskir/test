@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemies
+  - Ground
   layers:
   - Default
   - TransparentFX
@@ -15,7 +17,7 @@ TagManager:
   - World Objects
   - Player
   - Background
-  - 
+  - Enemies
   - 
   - 
   - 
@@ -49,6 +51,9 @@ TagManager:
     locked: 0
   - name: World Objects
     uniqueID: 2099485531
+    locked: 0
+  - name: Enemies
+    uniqueID: 1149926611
     locked: 0
   - name: Player
     uniqueID: 4047077809
